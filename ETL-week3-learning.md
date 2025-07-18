@@ -87,6 +87,31 @@ ETL (Extract, Transform, Load) in LangChain Context
 
 ---
 
+## **Example of ETL in LangChain**
+
+```python
+## ETL Example in Langchain
+
+# 1. Extract
+docs = PDFLoader("invoice.pdf").load()
+
+# 2. Transform (using LLM chain)
+from langchain.llms import OpenAI
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
+
+prompt = PromptTemplate(template="Extract invoice number from: {text}", input_variables=["text"])
+chain = LLMChain(llm=OpenAI(), prompt=prompt)
+invoice_num = chain.run(text=docs[0].page_content)
+
+# 3. Load (store for retrieval)
+from langchain.vectorstores import Chroma
+from langchain.embeddings import OpenAIEmbeddings
+Chroma.from_documents(docs, OpenAIEmbeddings())
+```
+
+---
+
 ## **Example ETL Pipeline in GenAI**
 
 Suppose you want to build a bot for your company’s PDF manuals:
