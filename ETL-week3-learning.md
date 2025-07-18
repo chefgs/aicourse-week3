@@ -32,7 +32,9 @@ In GenAI, we often work with **large volumes of unstructured data**:
 * Web pages
 * Spreadsheets
 
-Before we can use this data with language models (like those you work with in LangChain), it needs to be **organized, cleaned, and structured**. ETL is the process that makes this possible.
+Before we can use this data with language models (like those you work with in LangChain), it needs to be **organized, cleaned, and structured**. 
+
+So, this is where the **ETL process** comes in. That makes this possible to accomplish the GenAI app development.
 
 ---
 
