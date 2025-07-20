@@ -6,9 +6,19 @@ from langchain_openai import OpenAIEmbeddings, OpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain_community.vectorstores import FAISS
 from langchain.memory import ConversationBufferMemory
+import pathlib
 
-# Load .env variables (API keys, etc.)
-load_dotenv()
+# Check for .streamlit/secrets.toml (Streamlit Cloud or local dev)
+openai_api_key = None
+secrets_toml_path = pathlib.Path(".streamlit/secrets.toml")
+if secrets_toml_path.exists() and "OPENAI_API_KEY" in st.secrets:
+    openai_api_key = st.secrets["OPENAI_API_KEY"]
+else:
+    load_dotenv()
+    openai_api_key = os.environ.get("OPENAI_API_KEY")
+if not openai_api_key:
+    st.error("OpenAI API key not found. Please set it in .streamlit/secrets.toml or .env file.")
+    st.stop()
 
 # --- SIDEBAR: About & Use Cases ---
 st.sidebar.title("About This Chatbot 🤖")
@@ -40,11 +50,11 @@ st.markdown(
 def setup_chain():
     loader = WebBaseLoader("https://cloudenginelabs.io")
     docs = loader.load()
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
     vectorstore = FAISS.from_documents(docs, embeddings)
     # See migration guide for memory: https://python.langchain.com/docs/versions/migrating_memory/
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-    llm = OpenAI(temperature=0)
+    llm = OpenAI(openai_api_key=openai_api_key, temperature=0)
     qa_chain = ConversationalRetrievalChain.from_llm(
         llm=llm,
         retriever=vectorstore.as_retriever(),
